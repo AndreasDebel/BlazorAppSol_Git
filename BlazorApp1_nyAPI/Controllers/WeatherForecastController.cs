@@ -24,9 +24,9 @@ namespace BlazorApp1_nyAPI.Controllers
             _logger = logger;
         }
 
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<WeatherForecast> Get(int count)
         {
-            return Enumerable.Range(1, 20).Select(index => new WeatherForecast
+            return Enumerable.Range(1, count).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),

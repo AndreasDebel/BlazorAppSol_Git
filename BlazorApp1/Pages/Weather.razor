@@ -9,6 +9,11 @@
 <p>This component demonstrates fetching data from the server.</p>
 
 <button class="btn-secondary" @onclick="changeScale">@(tempInC ? "To Fahrenheit" : "To Celcius")</button>
+
+<button class="btn-secondary" @onclick="() => forecastAmount(5)">+5</button>
+<button class="btn-secondary" @onclick="() => forecastAmount(-5)">-5</button>
+<br />
+<br />
 <br />
 
 @if (forecasts == null)
@@ -32,7 +37,7 @@ else
                 <tr style="@(i % 2 == 0 ? "background-color: white;" : "")">
                     <td>@DateTime.Now.AddDays(i).ToString("yyyy-MM-dd")</td>
                     <td>@(tempInC ? forecasts[i].TemperatureC : forecasts[i].TemperatureF)</td>
-                    <td style="">@forecasts[i].Summary</td>
+                    <td style="color: @getTempColor(forecasts[i]?.Summary)">@forecasts[i].Summary</td>
                     <td>@forecasts[i].City</td>
                 </tr>
             }
@@ -40,14 +45,29 @@ else
     </table>
 }
 
+
+
+
 <DiceRoll noOfDice="5" />
 
 @code {
     private WeatherForecast[]? forecasts;
 
+    int numOfForecasts = 3;
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>($"https:localhost:7018/getweather?count={numOfForecasts}");
+    // }
+
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("https://localhost:7018/getweather");
+        await LoadForecasts();
+    }
+
+    private async Task LoadForecasts()
+    {
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>($"https://localhost:7018/getweather?count={numOfForecasts}");
     }
 
     bool tempInC = true;
@@ -57,17 +77,32 @@ else
         tempInC = !tempInC;
     }
 
-    private string getTempColor(int i)
+    private string getTempColor(string s)
     {
-        switch (forecasts[i].Summary)
+        switch (s)
         {
-            case "Freezing", "Brazing", "Cold" :
+            case "Freezing":
+            case "Bracing":
+            case "Chilly":
                 return "blue";
 
- 
-        } 
+            case "Hot":
+            case "Sweltering":
+            case "Scorching":
+                return "red";
+
+            default:
+                return "black";
+        }
+    }
 
 
+    private async Task forecastAmount(int i)
+    {
+        numOfForecasts += i;
+        if (numOfForecasts < 0) numOfForecasts = 0;
+        Console.WriteLine($"numOfForecasts increased is {numOfForecasts}");
+        await LoadForecasts();
     }
 
 }
