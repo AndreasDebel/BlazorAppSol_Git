@@ -1,0 +1,36 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService localStore
+@page "/localstorage"
+
+<h1>Your LocalStorage Note</h1>
+<textarea @bind="noteContent" />
+<br />
+<button @onclick="UpdateLocalStorage">Save</button>
+<button @onclick="ClearLocalStorage">Clear</button>
+
+<DiceRoll noOfDice="3" />
+
+@code{
+[Inject]
+public IJSRuntime JS { get; set; } = default!;
+
+const string noteKey = "note";
+string noteContent = "";
+
+public async void UpdateLocalStorage()
+    {
+    await localStore.SetItemAsync(noteKey, noteContent);
+    await JS.InvokeVoidAsync("alert", $"Succesfully saved to local storage!");
+    }
+
+public async void ClearLocalStorage()
+    {
+    noteContent = "";
+    await localStore.ClearAsync();
+    }
+
+protected override async Task OnInitializedAsync()
+    {
+        noteContent = await localStore.GetItemAsync<string>(noteKey) ?? "";
+    }
+
+}
