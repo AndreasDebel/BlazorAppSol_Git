@@ -1,35 +1,80 @@
 ﻿@page "/todo"
+@inject Blazored.LocalStorage.ILocalStorageService localStore
 @using BlazorApp1.Model
 
-<h1>ToDoList - version 1 - Der mangler @items.Count(item => !item.IsDone)</h1>
+<h1>ToDoList</h1>
 
-<h2>This second heading has css from the .razor.css isolation!</h2>
+<h2>Der mangler @items.Count(item => !item.IsDone)</h2>
 
-<ul>
-    @foreach (ToDoItem item in items)
-    {
-        <li>
-            <InputCheckbox @bind-Value="item.IsDone"></InputCheckbox>
-            <b>@item.Title</b>
-        </li>
-    }
-</ul>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Opgave</th>
+            <th>Udført?</th>
+            <th>Slet</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (ToDoItem item in items)
+        {
+            <tr>
+                <td><b>@item.Title</b></td>
+                <td><InputCheckbox @bind-Value="item.IsDone" @oninput="() => OnCheckboxChange(item)"></InputCheckbox></td>
+                <td><button class="btn btn-danger" style="width: @deleteBTNsize; height: @deleteBTNsize; border-radius: @deleteBTNsize;" @onclick="() => DeleteItemFromList(item)">X</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 <InputText @bind-Value="newToDo" placeHolder="Noget der skal gøres"></InputText>
 <button class="btn btn-primary" @onclick="AddToDo">Add</button>
 
 @code {
+    string deleteBTNsize = "40px";
+
+    public IJSRuntime JS { get; set; } = default!;
 
     string newToDo = "";
     List<ToDoItem> items = new();
 
-    protected override void OnInitialized()
-    {
-        items.Add(new ToDoItem { Title = "Test", IsDone = true });
-    }
+    const string storageKey = "storage";
+
 
     void AddToDo()
     {
         items.Add(new ToDoItem { Title = newToDo, IsDone = false });
+        UpdateLocalStorage();
     }
 
+    public async void UpdateLocalStorage()
+    {
+        await localStore.SetItemAsync(storageKey, items);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await localStore.GetItemAsync<List<ToDoItem>>(storageKey) ?? new List<ToDoItem>();
+        if (items.Count < 1)
+        {
+            items.Add(new ToDoItem { Title = "Test", IsDone = true });
+            UpdateLocalStorage();
+        }
+
+    }
+
+    // This will be called when the checkbox is changed
+    private async Task OnCheckboxChange(ToDoItem item)
+    {
+        await Task.Delay(1);
+
+        Console.WriteLine($"Checkbox changed for {item.Title}. IsDone: {item.IsDone}"); // Debugging line
+        UpdateLocalStorage();
+    }
+
+    // This will delete ToDoItem from items list
+    private void DeleteItemFromList(ToDoItem item)
+    {
+        items.Remove(item);
+        UpdateLocalStorage();
+    }
 }
