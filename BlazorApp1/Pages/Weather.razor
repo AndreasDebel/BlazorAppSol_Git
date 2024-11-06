@@ -56,11 +56,6 @@ else
 
     int numOfForecasts = 3;
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>($"https:localhost:7018/getweather?count={numOfForecasts}");
-    // }
-
     protected override async Task OnInitializedAsync()
     {
         await LoadForecasts();

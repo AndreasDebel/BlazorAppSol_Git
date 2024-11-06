@@ -2,7 +2,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStore
 @using BlazorApp1.Model
 
-<h1>ToDoList</h1>
+<h1>ToDoList2</h1>
 
 <h2>Der mangler @items.Count(item => !item.IsDone)</h2>
 
@@ -44,6 +44,7 @@
     {
         items.Add(new ToDoItem { Title = newToDo, IsDone = false });
         UpdateLocalStorage();
+        SortItems();
     }
 
     public async void UpdateLocalStorage()
@@ -62,6 +63,12 @@
 
     }
 
+
+    private void SortItems()
+    {
+        items.Sort();
+    }
+
     // This will be called when the checkbox is changed
     private async Task OnCheckboxChange(ToDoItem item)
     {
@@ -69,6 +76,7 @@
 
         Console.WriteLine($"Checkbox changed for {item.Title}. IsDone: {item.IsDone}"); // Debugging line
         UpdateLocalStorage();
+        SortItems();
     }
 
     // This will delete ToDoItem from items list
@@ -77,4 +85,6 @@
         items.Remove(item);
         UpdateLocalStorage();
     }
+
+
 }

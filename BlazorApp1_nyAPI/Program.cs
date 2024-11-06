@@ -1,16 +1,23 @@
+using BlazorApp1_nyAPI.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IToDoRepository, ToDoRepositoryInMemory>(); // Added with ToDoRepos
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("policy",
-                      policy =>
-                      {
-                          policy.AllowAnyOrigin();
-                      });
+        policy =>
+        {
+            policy.AllowAnyOrigin();
+            policy.AllowAnyHeader();
+            policy.AllowAnyMethod();
+        });
 });
+
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -8,6 +8,15 @@
 
   <ItemGroup>
 	<Compile Remove="Model\DiceStuff\RunDice.cs" />
+	<Compile Remove="Model\ToDoItem.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\ToDo.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\ToDo.razor.css" />
   </ItemGroup>
 	
   <ItemGroup>
